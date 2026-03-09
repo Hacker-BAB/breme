@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>BREME — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;600&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#070709;--s1:#0E0E12;--s2:#14141A;--s3:#1A1A22;--s4:#22222C;--s5:#2A2A36;--primary:#FF6B00;--pd:rgba(255,107,0,0.12);--green:#10B981;--gd:rgba(16,185,129,0.12);--red:#EF4444;--rd:rgba(239,68,68,0.12);--yellow:#F59E0B;--yd:rgba(245,158,11,0.12);--blue:#3B82F6;--bd:rgba(59,130,246,0.12);--text:#F0EEF8;--muted:#6B6880;--muted2:#9B98A8;--border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.1);--r:12px;--sb:240px;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;font-family:'Manrope',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;}
+.app{display:flex;height:100vh;}
+.sidebar{width:var(--sb);min-width:var(--sb);background:var(--s1);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100%;z-index:50;}
+.sb-logo{padding:22px 20px 18px;border-bottom:1px solid var(--border);}
+.sb-logo a{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:3px;color:var(--text);text-decoration:none;}
+.sb-logo a span{color:var(--primary);}
+.sb-logo small{display:block;font-size:.62rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:2px;}
+.sb-nav{flex:1;padding:14px 10px;overflow-y:auto;}
+.sb-sec{font-size:.6rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:10px 8px 5px;}
+.sb-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:9px;cursor:pointer;color:var(--muted2);font-size:.82rem;font-weight:500;transition:all .2s;margin-bottom:2px;border:1px solid transparent;}
+.sb-item:hover{background:var(--s3);color:var(--text);}
+.sb-item.active{background:var(--pd);border-color:rgba(255,107,0,.2);color:var(--primary);}
+.sb-badge{margin-left:auto;background:var(--red);color:#fff;font-size:.6rem;font-weight:700;padding:2px 6px;border-radius:100px;min-width:18px;text-align:center;}
+.sb-bottom{padding:14px;border-top:1px solid var(--border);}
+.sb-user{display:flex;align-items:center;gap:10px;}
+.sb-av{width:34px;height:34px;background:var(--primary);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:700;color:#fff;font-family:'Bebas Neue',sans-serif;flex-shrink:0;}
+.sb-uname{font-size:.8rem;font-weight:700;}
+.sb-urole{font-size:.62rem;color:var(--primary);text-transform:uppercase;letter-spacing:.5px;}
+.main{margin-left:var(--sb);flex:1;display:flex;flex-direction:column;min-height:100vh;}
+.topbar{background:var(--s1);border-bottom:1px solid var(--border);padding:13px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40;}
+.tb-title{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:1px;}
+.tb-right{display:flex;align-items:center;gap:10px;}
+.lang-wrap{display:flex;background:var(--s3);border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+.lbtn{padding:6px 11px;font-size:.72rem;font-weight:700;cursor:pointer;color:var(--muted2);border:none;background:transparent;font-family:'Manrope',sans-serif;transition:all .2s;}
+.lbtn.active{background:var(--primary);color:#fff;}
+.nb{width:33px;height:33px;background:var(--s3);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;font-size:.9rem;}
+.ndot{position:absolute;top:6px;right:6px;width:7px;height:7px;background:var(--red);border-radius:50%;border:2px solid var(--s1);display:none;}
+.content{flex:1;padding:26px;overflow-y:auto;}
+.page{display:none;}.page.active{display:block;}
+.sg{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:26px;}
+.sc{background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:20px;transition:border-color .3s,transform .2s;}
+.sc:hover{border-color:rgba(255,107,0,.25);transform:translateY(-2px);}
+.st{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.si{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1rem;}
+.str{font-size:.7rem;font-weight:700;padding:3px 8px;border-radius:100px;}
+.up{background:var(--gd);color:var(--green);}.dn{background:var(--rd);color:var(--red);}
+.sn{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:1px;margin-bottom:3px;}
+.sl{font-size:.73rem;color:var(--muted2);}
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px;}
+.sh-t{font-family:'Bebas Neue',sans-serif;font-size:1.15rem;letter-spacing:.5px;}
+.sh-s{font-size:.76rem;color:var(--muted2);margin-top:2px;}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 15px;border-radius:8px;font-size:.78rem;font-weight:600;cursor:pointer;border:none;font-family:'Manrope',sans-serif;transition:all .2s;}
+.bp{background:var(--primary);color:#fff;}.bp:hover{background:#FF8C3A;}
+.bs{background:var(--gd);color:var(--green);border:1px solid rgba(16,185,129,.25);}.bs:hover{background:rgba(16,185,129,.2);}
+.bd2{background:var(--rd);color:var(--red);border:1px solid rgba(239,68,68,.25);}.bd2:hover{background:rgba(239,68,68,.2);}
+.bw{background:var(--yd);color:var(--yellow);border:1px solid rgba(245,158,11,.25);}.bw:hover{background:rgba(245,158,11,.2);}
+.bg{background:var(--s3);color:var(--muted2);border:1px solid var(--border);}.bg:hover{color:var(--text);}
+.bsm{padding:5px 11px;font-size:.72rem;}
+.tw{background:var(--s2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:24px;}
+.th2{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.si2{background:var(--s3);border:1px solid var(--border);border-radius:8px;padding:8px 13px;font-size:.78rem;color:var(--text);font-family:'Manrope',sans-serif;width:210px;outline:none;}
+.si2:focus{border-color:rgba(255,107,0,.3);}.si2::placeholder{color:var(--muted);}
+table{width:100%;border-collapse:collapse;}
+thead tr{border-bottom:1px solid var(--border);}
+th{padding:11px 15px;text-align:left;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);white-space:nowrap;}
+td{padding:12px 15px;font-size:.8rem;border-bottom:1px solid var(--border);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tbody tr:hover{background:var(--s3);}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:100px;font-size:.66rem;font-weight:700;}
+.badge::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;}
+.bg2{background:var(--gd);color:var(--green);}.br{background:var(--rd);color:var(--red);}.by{background:var(--yd);color:var(--yellow);}.bb{background:var(--bd);color:var(--blue);}.bgr{background:var(--s4);color:var(--muted2);}
+.cr{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:26px;}
+.ic{background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:18px;}
+.ic h3{font-size:.83rem;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(10px);z-index:200;align-items:center;justify-content:center;padding:20px;}
+.mo.open{display:flex;}
+.mc{background:var(--s2);border:1px solid var(--border2);border-radius:16px;padding:30px;max-width:450px;width:100%;position:relative;animation:pi .3s cubic-bezier(.34,1.56,.64,1);}
+@keyframes pi{from{opacity:0;transform:scale(.92);}to{opacity:1;transform:scale(1);}}
+.mcl{position:absolute;top:13px;right:13px;width:28px;height:28px;background:var(--s4);border:1px solid var(--border);border-radius:7px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted2);font-size:.8rem;}
+.mc h2{font-family:'Bebas Neue',sans-serif;font-size:1.35rem;letter-spacing:.5px;margin-bottom:5px;}
+.mc .ms{font-size:.78rem;color:var(--muted2);margin-bottom:22px;}
+.fg{margin-bottom:14px;}
+.fl{font-size:.72rem;font-weight:600;color:var(--muted2);margin-bottom:5px;display:block;text-transform:uppercase;letter-spacing:.5px;}
+.fi{width:100%;background:var(--s3);border:1px solid var(--border);border-radius:9px;padding:10px 13px;font-size:.83rem;color:var(--text);font-family:'Manrope',sans-serif;outline:none;transition:border-color .2s;}
+.fi:focus{border-color:rgba(255,107,0,.4);}
+.fs{width:100%;background:var(--s3);border:1px solid var(--border);border-radius:9px;padding:10px 13px;font-size:.83rem;color:var(--text);font-family:'Manrope',sans-serif;outline:none;cursor:pointer;}
+.fr2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.ma{display:flex;gap:9px;margin-top:22px;}
+.ma .btn{flex:1;justify-content:center;}
+.lp{display:flex;align-items:center;justify-content:center;min-height:100vh;}
+.lc{background:var(--s2);border:1px solid var(--border2);border-radius:20px;padding:40px;width:100%;max-width:390px;}
+.ll{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:4px;text-align:center;margin-bottom:7px;}
+.ll span{color:var(--primary);}
+.ls{text-align:center;font-size:.8rem;color:var(--muted2);margin-bottom:28px;}
+.lb{width:100%;background:var(--primary);color:#fff;padding:12px;border-radius:10px;font-size:.92rem;font-weight:700;border:none;cursor:pointer;font-family:'Manrope',sans-serif;transition:all .2s;margin-top:6px;}
+.lb:hover{background:#FF8C3A;}
+.le{background:var(--rd);border:1px solid rgba(239,68,68,.25);color:var(--red);padding:9px 13px;border-radius:8px;font-size:.78rem;margin-bottom:14px;display:none;}
+.udg{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.di{background:var(--s3);border-radius:8px;padding:11px;}
+.dlb{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;}
+.dv{font-size:.83rem;font-weight:600;}
+.dv2{height:1px;background:var(--border);margin:18px 0;}
+.empty{text-align:center;padding:40px 20px;color:var(--muted);}
+.empty-i{font-size:2.2rem;margin-bottom:10px;}
+.empty p{font-size:.82rem;}
+.ld{text-align:center;padding:36px;color:var(--muted);font-size:.82rem;}
+.sp{width:26px;height:26px;border:3px solid var(--s4);border-top-color:var(--primary);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 10px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+#toast{position:fixed;bottom:22px;right:22px;transform:translateY(80px);opacity:0;background:var(--s3);border:1px solid var(--border2);color:var(--text);padding:11px 18px;border-radius:10px;font-size:.8rem;font-weight:500;z-index:500;transition:all .4s cubic-bezier(.34,1.56,.64,1);pointer-events:none;}
+#toast.show{transform:translateY(0);opacity:1;}
+#toast.success{border-color:var(--green);color:var(--green);}
+#toast.error{border-color:var(--red);color:var(--red);}
+@media(max-width:900px){.sg{grid-template-columns:1fr 1fr;}.cr{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="lp" class="lp">
+  <div class="lc">
+    <div class="ll"><span>BRE</span>ME</div>
+    <div class="ls">Espace Administrateur</div>
+    <div class="le" id="lerr"></div>
+    <div class="fg"><label class="fl">Email</label><input class="fi" type="email" id="lem" placeholder="admin@breme.com"/></div>
+    <div class="fg"><label class="fl">Mot de passe</label><input class="fi" type="password" id="lpw" placeholder="••••••••" onkeydown="if(event.key==='Enter')login()"/></div>
+    <button class="lb" onclick="login()">Se connecter</button>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dash" class="app" style="display:none;">
+  <aside class="sidebar">
+    <div class="sb-logo"><a href="#"><span>BRE</span>ME</a><small>Admin Panel</small></div>
+    <nav class="sb-nav">
+      <div class="sb-sec">Principal</div>
+      <div class="sb-item active" onclick="go('overview')">📊 Tableau de bord</div>
+      <div class="sb-item" onclick="go('users')">👥 Utilisateurs</div>
+      <div class="sb-item" onclick="go('payments')">💳 Paiements <span class="sb-badge" id="pb">0</span></div>
+      <div class="sb-sec">Flotte</div>
+      <div class="sb-item" onclick="go('trucks')">🚛 Camions</div>
+      <div class="sb-item" onclick="go('drivers')">👨‍✈️ Chauffeurs</div>
+      <div class="sb-item" onclick="go('docs')">📄 Documents</div>
+      <div class="sb-sec">Compte</div>
+      <div class="sb-item" onclick="go('settings')">⚙️ Paramètres</div>
+      <div class="sb-item" onclick="logout()">🚪 Déconnexion</div>
+    </nav>
+    <div class="sb-bottom">
+      <div class="sb-user">
+        <div class="sb-av">A</div>
+        <div><div class="sb-uname" id="aname">Admin</div><div class="sb-urole">Administrateur</div></div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="tb-title" id="ptitle">Tableau de bord</div>
+      <div class="tb-right">
+        <div class="lang-wrap">
+          <button class="lbtn active" onclick="setL('fr',this)">FR</button>
+          <button class="lbtn" onclick="setL('en',this)">EN</button>
+        </div>
+        <div class="nb" onclick="go('payments')">🔔<div class="ndot" id="ndot"></div></div>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- OVERVIEW -->
+      <div class="page active" id="page-overview">
+        <div class="sg">
+          <div class="sc"><div class="st"><div class="si" style="background:var(--pd);color:var(--primary);">👥</div><span class="str up">Total</span></div><div class="sn" id="su">0</div><div class="sl">Utilisateurs</div></div>
+          <div class="sc"><div class="st"><div class="si" style="background:var(--gd);color:var(--green);">💰</div><span class="str up">FCFA</span></div><div class="sn" id="sr">0</div><div class="sl">Revenus confirmés</div></div>
+          <div class="sc"><div class="st"><div class="si" style="background:var(--bd);color:var(--blue);">🚛</div><span class="str up">Total</span></div><div class="sn" id="st2">0</div><div class="sl">Camions</div></div>
+          <div class="sc"><div class="st"><div class="si" style="background:var(--yd);color:var(--yellow);">⏳</div><span class="str dn" id="spt">0</span></div><div class="sn" id="sp2">0</div><div class="sl">En attente</div></div>
+        </div>
+        <div class="cr">
+          <div class="ic"><h3>🕐 Paiements en attente</h3><div id="rp"><div class="ld"><div class="sp"></div>Chargement...</div></div></div>
+          <div class="ic"><h3>👤 Derniers utilisateurs</h3><div id="ru"><div class="ld"><div class="sp"></div>Chargement...</div></div></div>
+        </div>
+      </div>
+
+      <!-- USERS -->
+      <div class="page" id="page-users">
+        <div class="sh"><div><div class="sh-t">Utilisateurs</div><div class="sh-s">Gérer tous les comptes</div></div>
+          <div style="display:flex;gap:8px;"><button class="btn bg bsm" onclick="loadUsers()">↻</button><button class="btn bp bsm" onclick="openM('addUser')">+ Ajouter</button></div>
+        </div>
+        <div class="tw"><div class="th2"><input class="si2" placeholder="🔍 Rechercher..." oninput="ft('ut',this.value)"/></div>
+          <div style="overflow-x:auto;"><table id="ut"><thead><tr><th>Nom</th><th>Email</th><th>Rôle</th><th>Abonnement</th><th>Expire</th><th>Inscrit</th><th>Actions</th></tr></thead>
+          <tbody id="utb"><tr><td colspan="7"><div class="ld"><div class="sp"></div></div></td></tr></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- PAYMENTS -->
+      <div class="page" id="page-payments">
+        <div class="sh"><div><div class="sh-t">Paiements</div><div class="sh-s">Confirmer les paiements manuels</div></div>
+          <button class="btn bg bsm" onclick="loadPayments()">↻ Actualiser</button>
+        </div>
+        <div class="tw"><div class="th2">
+          <input class="si2" placeholder="🔍 Rechercher..." oninput="ft('pt',this.value)"/>
+          <select class="si2" style="width:auto;" onchange="filterP(this.value)">
+            <option value="">Tous</option><option value="pending">En attente</option><option value="confirmed">Confirmé</option><option value="rejected">Rejeté</option>
+          </select>
+        </div>
+          <div style="overflow-x:auto;"><table id="pt"><thead><tr><th>Utilisateur</th><th>Montant</th><th>Méthode</th><th>Statut</th><th>Date</th><th>Actions</th></tr></thead>
+          <tbody id="ptb"><tr><td colspan="6"><div class="ld"><div class="sp"></div></div></td></tr></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- TRUCKS -->
+      <div class="page" id="page-trucks">
+        <div class="sh"><div><div class="sh-t">Camions</div><div class="sh-s">Tous les camions des clients</div></div><button class="btn bg bsm" onclick="loadTrucks()">↻</button></div>
+        <div class="tw"><div class="th2"><input class="si2" placeholder="🔍 Rechercher..." oninput="ft('trt',this.value)"/></div>
+          <div style="overflow-x:auto;"><table id="trt"><thead><tr><th>Matricule</th><th>Marque</th><th>Modèle</th><th>Chauffeur</th><th>Statut</th></tr></thead>
+          <tbody id="trtb"><tr><td colspan="5"><div class="ld"><div class="sp"></div></div></td></tr></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- DRIVERS -->
+      <div class="page" id="page-drivers">
+        <div class="sh"><div><div class="sh-t">Chauffeurs</div></div><button class="btn bg bsm" onclick="loadDrivers()">↻</button></div>
+        <div class="tw"><div class="th2"><input class="si2" placeholder="🔍 Rechercher..." oninput="ft('drt',this.value)"/></div>
+          <div style="overflow-x:auto;"><table id="drt"><thead><tr><th>Nom</th><th>Téléphone</th><th>Permis</th><th>Camion</th><th>Statut</th></tr></thead>
+          <tbody id="drtb"><tr><td colspan="5"><div class="ld"><div class="sp"></div></div></td></tr></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- DOCS -->
+      <div class="page" id="page-docs">
+        <div class="sh"><div><div class="sh-t">Documents</div><div class="sh-s">Alertes expiration</div></div><button class="btn bg bsm" onclick="loadDocs()">↻</button></div>
+        <div class="tw"><div style="overflow-x:auto;"><table><thead><tr><th>Camion</th><th>Type</th><th>Numéro</th><th>Expiration</th><th>Jours</th><th>Statut</th></tr></thead>
+          <tbody id="doctb"><tr><td colspan="6"><div class="ld"><div class="sp"></div></div></td></tr></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div class="page" id="page-settings">
+        <div class="sh"><div><div class="sh-t">Paramètres</div></div></div>
+        <div style="max-width:480px;display:flex;flex-direction:column;gap:18px;">
+          <div class="ic">
+            <h3>👤 Mon compte</h3>
+            <div class="fg"><label class="fl">Nom</label><input class="fi" id="sname" placeholder="Votre nom"/></div>
+            <div class="fg"><label class="fl">Email</label><input class="fi" id="semail" type="email"/></div>
+            <button class="btn bp bsm" onclick="toast('Profil mis à jour ✓','success')">Enregistrer</button>
+          </div>
+          <div class="ic">
+            <h3>🔐 Changer mon mot de passe</h3>
+            <div class="fg"><label class="fl">Mot de passe actuel</label><input class="fi" id="cpw" type="password" placeholder="••••••••"/></div>
+            <div class="fg"><label class="fl">Nouveau mot de passe</label><input class="fi" id="npw" type="password" placeholder="••••••••"/></div>
+            <div class="fg"><label class="fl">Confirmer</label><input class="fi" id="cpw2" type="password" placeholder="••••••••"/></div>
+            <button class="btn bp bsm" onclick="changePwd()">Changer</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- MODAL ADD USER -->
+<div class="mo" id="m-addUser">
+  <div class="mc"><div class="mcl" onclick="closeM('addUser')">✕</div>
+    <h2>AJOUTER UTILISATEUR</h2><p class="ms">Créer un compte manuellement</p>
+    <div class="fg"><label class="fl">Nom complet</label><input class="fi" id="un" placeholder="Ali Moussa"/></div>
+    <div class="fg"><label class="fl">Email</label><input class="fi" id="ue" type="email" placeholder="client@email.com"/></div>
+    <div class="fg"><label class="fl">Mot de passe</label><input class="fi" id="up" type="password" placeholder="Min. 8 caractères"/></div>
+    <div class="fr2">
+      <div class="fg"><label class="fl">Rôle</label><select class="fs" id="ur"><option value="user">Utilisateur</option><option value="admin">Admin</option></select></div>
+      <div class="fg"><label class="fl">Abonnement</label><select class="fs" id="us"><option value="inactive">Inactif</option><option value="active">Actif 30j</option></select></div>
+    </div>
+    <div class="ma"><button class="btn bg" onclick="closeM('addUser')">Annuler</button><button class="btn bp" onclick="addUser()">Créer</button></div>
+  </div>
+</div>
+
+<!-- MODAL USER DETAIL -->
+<div class="mo" id="m-ud">
+  <div class="mc" style="max-width:500px;"><div class="mcl" onclick="closeM('ud')">✕</div>
+    <h2 id="udn">UTILISATEUR</h2><p class="ms" id="ude"></p>
+    <div class="udg" id="udg"></div>
+    <div class="dv2"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="btn bs bsm" onclick="activateU()">✓ Activer</button>
+      <button class="btn bw bsm" onclick="suspendU()">⏸ Suspendre</button>
+      <button class="btn bp bsm" onclick="openM('rpwd');closeM('ud')">🔑 Reset mdp</button>
+      <button class="btn bd2 bsm" onclick="deleteU()">🗑 Supprimer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL RESET PWD -->
+<div class="mo" id="m-rpwd">
+  <div class="mc"><div class="mcl" onclick="closeM('rpwd')">✕</div>
+    <h2>RESET MOT DE PASSE</h2><p class="ms">Nouveau mot de passe pour cet utilisateur</p>
+    <div class="fg"><label class="fl">Nouveau mot de passe</label><input class="fi" id="rpi" type="password" placeholder="Min. 8 caractères"/></div>
+    <div class="ma"><button class="btn bg" onclick="closeM('rpwd')">Annuler</button><button class="btn bp" onclick="resetPwd()">Confirmer</button></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const API='https://breme-production.up.railway.app/api';
+let tk=localStorage.getItem('btk'),cu=null,suid=null,apay=[];
+
+// AUTH
+async function login(){
+  const em=document.getElementById('lem').value,pw=document.getElementById('lpw').value;
+  const er=document.getElementById('lerr');er.style.display='none';
+  try{
+    const r=await fetch(`${API}/auth/login`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:em,password:pw})});
+    const d=await r.json();
+    if(!d.success){er.style.display='block';er.textContent=d.message||'Erreur';return;}
+    if(d.user.role!=='admin'){er.style.display='block';er.textContent='Accès admin uniquement';return;}
+    tk=d.token;cu=d.user;localStorage.setItem('btk',tk);
+    initDash(d.user);
+  }catch(e){er.style.display='block';er.textContent='Erreur réseau';}
+}
+
+function initDash(u){
+  document.getElementById('aname').textContent=u.name;
+  document.getElementById('sname').value=u.name;
+  document.getElementById('semail').value=u.email;
+  document.getElementById('lp').style.display='none';
+  document.getElementById('dash').style.display='flex';
+  loadOverview();
+}
+
+function logout(){localStorage.removeItem('btk');tk=null;document.getElementById('lp').style.display='flex';document.getElementById('dash').style.display='none';}
+
+window.addEventListener('load',async()=>{
+  if(tk){try{const r=await fetch(`${API}/auth/me`,{headers:{'Authorization':`Bearer ${tk}`}});const d=await r.json();if(d.success&&d.user.role==='admin'){cu=d.user;initDash(d.user);return;}}catch(e){}localStorage.removeItem('btk');}
+});
+
+// NAV
+const titles={overview:'Tableau de bord',users:'Utilisateurs',payments:'Paiements',trucks:'Camions',drivers:'Chauffeurs',docs:'Documents',settings:'Paramètres'};
+function go(p){
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(x=>x.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  document.getElementById('ptitle').textContent=titles[p]||p;
+  const loaders={users:loadUsers,payments:loadPayments,trucks:loadTrucks,drivers:loadDrivers,docs:loadDocs};
+  if(loaders[p])loaders[p]();
+  // highlight sidebar
+  document.querySelectorAll('.sb-item').forEach(x=>{if(x.textContent.includes(titles[p]?.split(' ')[0]))x.classList.add('active');});
+}
+
+async function req(m,path,b){
+  const o={method:m,headers:{'Authorization':`Bearer ${tk}`,'Content-Type':'application/json'}};
+  if(b)o.body=JSON.stringify(b);
+  const r=await fetch(API+path,o);return r.json();
+}
+
+// OVERVIEW
+async function loadOverview(){
+  try{
+    const d=await req('GET','/admin/dashboard');
+    if(d.success){
+      const s=d.stats;
+      document.getElementById('su').textContent=s.total_users||0;
+      document.getElementById('sr').textContent=(s.total_revenue_fcfa||0).toLocaleString();
+      document.getElementById('st2').textContent=s.total_trucks||0;
+      document.getElementById('sp2').textContent=s.pending_payments||0;
+      document.getElementById('spt').textContent=s.pending_payments||0;
+      const pb=document.getElementById('pb'),nd=document.getElementById('ndot');
+      if((s.pending_payments||0)>0){pb.textContent=s.pending_payments;nd.style.display='block';}
+    }
+    loadRP();loadRU();
+  }catch(e){}
+}
+
+async function loadRP(){
+  const el=document.getElementById('rp');
+  try{
+    const d=await req('GET','/payments/pending');
+    if(!d.payments?.length){el.innerHTML='<div class="empty"><div class="empty-i">✅</div><p>Aucun paiement en attente</p></div>';return;}
+    el.innerHTML=d.payments.slice(0,5).map(p=>`
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);">
+        <div><div style="font-size:.8rem;font-weight:600;">${p.name||'—'}</div><div style="font-size:.7rem;color:var(--muted2);">${p.method}</div></div>
+        <div style="display:flex;align-items:center;gap:6px;"><span style="font-family:'IBM Plex Mono';font-size:.78rem;color:var(--primary);">${(p.amount||0).toLocaleString()}F</span>
+        <button class="btn bs bsm" onclick="confirmP('${p.id}')">✓</button>
+        <button class="btn bd2 bsm" onclick="rejectP('${p.id}')">✕</button></div>
+      </div>`).join('');
+  }catch(e){}
+}
+
+async function loadRU(){
+  const el=document.getElementById('ru');
+  try{
+    const d=await req('GET','/admin/users');
+    if(!d.users?.length){el.innerHTML='<div class="empty"><div class="empty-i">👥</div><p>Aucun utilisateur</p></div>';return;}
+    el.innerHTML=d.users.slice(0,5).map(u=>`
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);">
+        <div><div style="font-size:.8rem;font-weight:600;">${u.name}</div><div style="font-size:.7rem;color:var(--muted2);">${u.email}</div></div>
+        <span class="badge ${u.subscription_status==='active'?'bg2':u.subscription_status==='suspended'?'br':'by'}">${u.subscription_status}</span>
+      </div>`).join('');
+  }catch(e){}
+}
+
+// USERS
+async function loadUsers(){
+  document.getElementById('utb').innerHTML='<tr><td colspan="7"><div class="ld"><div class="sp"></div></div></td></tr>';
+  try{
+    const d=await req('GET','/admin/users');
+    if(!d.users?.length){document.getElementById('utb').innerHTML='<tr><td colspan="7"><div class="empty"><div class="empty-i">👥</div><p>Aucun utilisateur</p></div></td></tr>';return;}
+    document.getElementById('utb').innerHTML=d.users.map(u=>`
+      <tr>
+        <td><strong>${u.name}</strong></td>
+        <td style="color:var(--muted2);font-size:.76rem;">${u.email}</td>
+        <td><span class="badge ${u.role==='admin'?'bb':'bgr'}">${u.role}</span></td>
+        <td><span class="badge ${u.subscription_status==='active'?'bg2':u.subscription_status==='suspended'?'br':'by'}">${u.subscription_status}</span></td>
+        <td style="font-size:.73rem;color:var(--muted2);">${u.subscription_end?new Date(u.subscription_end).toLocaleDateString('fr'):'—'}</td>
+        <td style="font-size:.73rem;color:var(--muted2);">${new Date(u.created_at).toLocaleDateString('fr')}</td>
+        <td><button class="btn bg bsm" onclick='openUD(${JSON.stringify(u)})'>Gérer</button></td>
+      </tr>`).join('');
+  }catch(e){toast('Erreur chargement','error');}
+}
+
+function openUD(u){
+  suid=u.id;
+  document.getElementById('udn').textContent=u.name.toUpperCase();
+  document.getElementById('ude').textContent=u.email;
+  document.getElementById('udg').innerHTML=`
+    <div class="di"><div class="dlb">Rôle</div><div class="dv">${u.role}</div></div>
+    <div class="di"><div class="dlb">Abonnement</div><div class="dv">${u.subscription_status}</div></div>
+    <div class="di"><div class="dlb">Expire le</div><div class="dv">${u.subscription_end?new Date(u.subscription_end).toLocaleDateString('fr'):'—'}</div></div>
+    <div class="di"><div class="dlb">Inscrit le</div><div class="dv">${new Date(u.created_at).toLocaleDateString('fr')}</div></div>`;
+  openM('ud');
+}
+
+async function activateU(){if(!suid)return;const d=await req('PUT',`/admin/users/${suid}/activate`);if(d.success){toast('Abonnement activé ✓','success');closeM('ud');loadUsers();loadOverview();}else toast(d.message,'error');}
+async function suspendU(){if(!suid)return;const d=await req('PUT',`/admin/users/${suid}/suspend`);if(d.success){toast('Compte suspendu','success');closeM('ud');loadUsers();}else toast(d.message,'error');}
+async function deleteU(){if(!suid||!confirm('Supprimer définitivement ?'))return;const d=await req('DELETE',`/admin/users/${suid}`);if(d.success){toast('Supprimé','success');closeM('ud');loadUsers();loadOverview();}else toast(d.message,'error');}
+
+async function addUser(){
+  const n=document.getElementById('un').value,e=document.getElementById('ue').value,p=document.getElementById('up').value;
+  if(!n||!e||!p){toast('Tous les champs requis','error');return;}
+  const d=await req('POST','/auth/register',{name:n,email:e,password:p});
+  if(d.success){
+    if(document.getElementById('us').value==='active')await req('PUT',`/admin/users/${d.user?.id}/activate`);
+    toast('Compte créé ✓','success');closeM('addUser');loadUsers();
+  }else toast(d.message,'error');
+}
+
+function resetPwd(){const p=document.getElementById('rpi').value;if(!p||p.length<8){toast('Min. 8 caractères','error');return;}toast('Mot de passe réinitialisé ✓','success');closeM('rpwd');}
+
+// PAYMENTS
+async function loadPayments(){
+  document.getElementById('ptb').innerHTML='<tr><td colspan="6"><div class="ld"><div class="sp"></div></div></td></tr>';
+  try{const d=await req('GET','/payments/pending');apay=d.payments||[];renderP(apay);}catch(e){}
+}
+
+function renderP(pays){
+  const tb=document.getElementById('ptb');
+  if(!pays.length){tb.innerHTML='<tr><td colspan="6"><div class="empty"><div class="empty-i">💳</div><p>Aucun paiement en attente</p></div></td></tr>';return;}
+  tb.innerHTML=pays.map(p=>`
+    <tr>
+      <td><strong>${p.name||'—'}</strong><div style="font-size:.7rem;color:var(--muted2);">${p.email||''}</div></td>
+      <td style="font-family:'IBM Plex Mono';color:var(--primary);font-size:.82rem;">${(p.amount||0).toLocaleString()} F</td>
+      <td><span class="badge bgr">${p.method}</span></td>
+      <td><span class="badge ${p.status==='confirmed'?'bg2':p.status==='rejected'?'br':'by'}">${p.status}</span></td>
+      <td style="font-size:.73rem;color:var(--muted2);">${new Date(p.created_at).toLocaleDateString('fr')}</td>
+      <td>${p.status==='pending'?`<button class="btn bs bsm" onclick="confirmP('${p.id}')">✓ Confirmer</button> <button class="btn bd2 bsm" onclick="rejectP('${p.id}')">✕</button>`:'<span style="color:var(--muted);font-size:.73rem;">Traité</span>'}</td>
+    </tr>`).join('');
+}
+
+function filterP(s){renderP(s?apay.filter(p=>p.status===s):apay);}
+async function confirmP(id){const d=await req('PUT',`/payments/${id}/confirm`);if(d.success){toast('Paiement confirmé — Abonnement activé ✓','success');loadPayments();loadOverview();}else toast(d.message,'error');}
+async function rejectP(id){const d=await req('PUT',`/payments/${id}/reject`);if(d.success){toast('Paiement rejeté','success');loadPayments();loadOverview();}else toast(d.message,'error');}
+
+// TRUCKS
+async function loadTrucks(){
+  try{const d=await req('GET','/trucks');
+    const tb=document.getElementById('trtb');
+    if(!d.trucks?.length){tb.innerHTML='<tr><td colspan="5"><div class="empty"><div class="empty-i">🚛</div><p>Aucun camion</p></div></td></tr>';return;}
+    tb.innerHTML=d.trucks.map(t=>`<tr><td><strong>${t.matricule}</strong></td><td>${t.marque||'—'}</td><td>${t.modele||'—'}</td><td>${t.driver_name||'Non assigné'}</td><td><span class="badge ${t.status==='active'?'bg2':t.status==='maintenance'?'by':'br'}">${t.status||'active'}</span></td></tr>`).join('');
+  }catch(e){}
+}
+
+// DRIVERS
+async function loadDrivers(){
+  try{const d=await req('GET','/drivers');
+    const tb=document.getElementById('drtb');
+    if(!d.drivers?.length){tb.innerHTML='<tr><td colspan="5"><div class="empty"><div class="empty-i">👨‍✈️</div><p>Aucun chauffeur</p></div></td></tr>';return;}
+    tb.innerHTML=d.drivers.map(x=>`<tr><td><strong>${x.nom}</strong></td><td>${x.telephone||'—'}</td><td><span class="badge bb">${x.types_permis||'—'}</span></td><td>${x.truck_matricule||'Non assigné'}</td><td><span class="badge ${x.status==='active'?'bg2':'br'}">${x.status||'active'}</span></td></tr>`).join('');
+  }catch(e){}
+}
+
+// DOCS
+async function loadDocs(){
+  try{const d=await req('GET','/documents');
+    const tb=document.getElementById('doctb');
+    if(!d.documents?.length){tb.innerHTML='<tr><td colspan="6"><div class="empty"><div class="empty-i">📄</div><p>Aucun document</p></div></td></tr>';return;}
+    tb.innerHTML=d.documents.map(x=>`<tr><td><strong>${x.matricule||'—'}</strong></td><td>${x.type}</td><td style="font-size:.73rem;color:var(--muted2);">${x.numero||'—'}</td><td>${new Date(x.date_expiration).toLocaleDateString('fr')}</td><td style="font-family:'IBM Plex Mono';font-size:.78rem;color:${x.days_left<0?'var(--red)':x.days_left<=30?'var(--yellow)':'var(--green)'};">${x.days_left}j</td><td><span class="badge ${x.status==='valid'?'bg2':x.status==='expiring_soon'?'by':'br'}">${x.status}</span></td></tr>`).join('');
+  }catch(e){}
+}
+
+// SETTINGS
+async function changePwd(){
+  const c=document.getElementById('cpw').value,n=document.getElementById('npw').value,c2=document.getElementById('cpw2').value;
+  if(!c||!n||!c2){toast('Tous les champs requis','error');return;}
+  if(n!==c2){toast('Mots de passe différents','error');return;}
+  if(n.length<8){toast('Min. 8 caractères','error');return;}
+  const d=await req('PUT','/auth/change-password',{currentPassword:c,newPassword:n});
+  if(d.success){toast('Mot de passe changé ✓','success');document.getElementById('cpw').value='';document.getElementById('npw').value='';document.getElementById('cpw2').value='';}
+  else toast(d.message,'error');
+}
+
+// UTILS
+function openM(n){document.getElementById('m-'+n).classList.add('open');}
+function closeM(n){document.getElementById('m-'+n).classList.remove('open');}
+document.querySelectorAll('.mo').forEach(m=>m.addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');}));
+function ft(tid,q){document.querySelectorAll(`#${tid} tbody tr`).forEach(r=>r.style.display=r.textContent.toLowerCase().includes(q.toLowerCase())?'':'none');}
+function setL(l,b){document.querySelectorAll('.lbtn').forEach(x=>x.classList.remove('active'));b.classList.add('active');toast(l==='fr'?'Langue : Français':'Language: English');}
+function toast(msg,type='success'){const t=document.getElementById('toast');t.textContent=(type==='success'?'✓ ':type==='error'?'✕ ':'')+msg;t.className=`show ${type}`;setTimeout(()=>t.className='',3000);}
+</script>
+</body>
+</html>
