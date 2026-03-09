@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BREME — Gestion de Flotte</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --orange:#FF6B00; --orange-light:#FF8C35;
+      --dark:#0A0A0F; --dark2:#12121A; --dark3:#1A1A26;
+      --card:#1E1E2E; --border:rgba(255,107,0,0.2);
+      --text:#E8E8F0; --muted:#7878A0;
+      --green:#00E5A0; --red:#FF4560; --yellow:#FFB800;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:var(--dark); color:var(--text); font-family:'Outfit',sans-serif; min-height:100vh; overflow-x:hidden; }
+    .bg-grid {
+      position:fixed; inset:0; z-index:0;
+      background-image: linear-gradient(rgba(255,107,0,0.04) 1px,transparent 1px), linear-gradient(90deg,rgba(255,107,0,0.04) 1px,transparent 1px);
+      background-size:40px 40px; pointer-events:none;
+    }
+    .bg-glow { position:fixed; top:-200px; right:-200px; width:600px; height:600px; border-radius:50%; background:radial-gradient(circle,rgba(255,107,0,0.12) 0%,transparent 70%); pointer-events:none; z-index:0; }
+    nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; align-items:center; justify-content:space-between; padding:18px 40px; background:rgba(10,10,15,0.85); backdrop-filter:blur(12px); border-bottom:1px solid var(--border); }
+    .logo { font-family:'Bebas Neue',sans-serif; font-size:2rem; letter-spacing:4px; color:var(--orange); text-shadow:0 0 30px rgba(255,107,0,0.5); }
+    .logo span { color:var(--text); }
+    .nav-btns { display:flex; gap:12px; }
+    .btn { padding:10px 24px; border-radius:8px; font-family:'Outfit',sans-serif; font-size:0.9rem; font-weight:600; cursor:pointer; transition:all 0.2s; border:none; text-decoration:none; display:inline-flex; align-items:center; gap:8px; }
+    .btn-ghost { background:transparent; color:var(--text); border:1px solid var(--border); }
+    .btn-ghost:hover { border-color:var(--orange); color:var(--orange); }
+    .btn-primary { background:var(--orange); color:#fff; box-shadow:0 4px 20px rgba(255,107,0,0.3); }
+    .btn-primary:hover { background:var(--orange-light); transform:translateY(-1px); }
+    .hero { position:relative; z-index:1; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:120px 20px 60px; }
+    .hero-badge { display:inline-flex; align-items:center; gap:8px; background:rgba(255,107,0,0.1); border:1px solid var(--border); padding:8px 20px; border-radius:50px; font-size:0.8rem; color:var(--orange); margin-bottom:32px; animation:fadeDown 0.8s ease both; }
+    .hero-badge::before { content:''; width:8px; height:8px; border-radius:50%; background:var(--orange); animation:pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.3)} }
+    .hero h1 { font-family:'Bebas Neue',sans-serif; font-size:clamp(4rem,10vw,8rem); letter-spacing:8px; line-height:1; animation:fadeDown 0.8s ease 0.1s both; }
+    .hero h1 span { color:var(--orange); }
+    .hero p { font-size:1.2rem; color:var(--muted); max-width:540px; margin:24px auto 48px; animation:fadeDown 0.8s ease 0.2s both; }
+    .hero-cta { display:flex; gap:16px; flex-wrap:wrap; justify-content:center; animation:fadeDown 0.8s ease 0.3s both; }
+    @keyframes fadeDown { from{opacity:0;transform:translateY(-20px)} to{opacity:1;transform:translateY(0)} }
+    .stats { position:relative; z-index:1; display:flex; gap:24px; flex-wrap:wrap; justify-content:center; padding:0 20px 80px; }
+    .stat-card { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:28px 36px; text-align:center; transition:all 0.3s; }
+    .stat-card:hover { border-color:var(--orange); transform:translateY(-4px); }
+    .stat-num { font-family:'Bebas Neue',sans-serif; font-size:3rem; color:var(--orange); }
+    .stat-label { color:var(--muted); font-size:0.9rem; margin-top:4px; }
+    .features { position:relative; z-index:1; padding:80px 20px; max-width:1100px; margin:0 auto; }
+    .section-title { font-family:'Bebas Neue',sans-serif; font-size:3rem; letter-spacing:4px; text-align:center; margin-bottom:60px; }
+    .section-title span { color:var(--orange); }
+    .features-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:24px; }
+    .feature-card { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:32px; transition:all 0.3s; }
+    .feature-card:hover { border-color:var(--orange); transform:translateY(-6px); }
+    .feature-icon { width:56px; height:56px; border-radius:14px; background:rgba(255,107,0,0.1); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:1.5rem; margin-bottom:20px; }
+    .feature-card h3 { font-size:1.1rem; font-weight:700; margin-bottom:10px; }
+    .feature-card p { color:var(--muted); font-size:0.9rem; line-height:1.7; }
+    .pricing { position:relative; z-index:1; padding:80px 20px; text-align:center; }
+    .price-card { display:inline-block; background:var(--card); border:2px solid var(--orange); border-radius:24px; padding:48px 60px; max-width:420px; box-shadow:0 0 60px rgba(255,107,0,0.15); }
+    .price-amount { font-family:'Bebas Neue',sans-serif; font-size:5rem; color:var(--orange); letter-spacing:2px; line-height:1; }
+    .price-period { color:var(--muted); font-size:1rem; margin-bottom:32px; }
+    .price-features { text-align:left; margin-bottom:36px; }
+    .price-feature { display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid var(--border); font-size:0.95rem; }
+    .price-feature:last-child { border-bottom:none; }
+    .check { color:var(--green); font-size:1.1rem; }
+    footer { position:relative; z-index:1; text-align:center; padding:40px 20px; border-top:1px solid var(--border); color:var(--muted); font-size:0.9rem; }
+    footer strong { color:var(--orange); }
+
+    /* MODALS */
+    .modal-overlay { display:none; position:fixed; inset:0; z-index:200; background:rgba(0,0,0,0.8); backdrop-filter:blur(4px); align-items:center; justify-content:center; padding:20px; }
+    .modal-overlay.active { display:flex; }
+    .modal { background:var(--card); border:1px solid var(--border); border-radius:20px; padding:40px; width:100%; max-width:480px; position:relative; animation:modalIn 0.3s ease; }
+    @keyframes modalIn { from{opacity:0;transform:scale(0.95) translateY(20px)} to{opacity:1;transform:scale(1) translateY(0)} }
+    .modal-title { font-family:'Bebas Neue',sans-serif; font-size:2rem; letter-spacing:3px; color:var(--orange); margin-bottom:8px; }
+    .modal-sub { color:var(--muted); font-size:0.9rem; margin-bottom:28px; }
+    .form-group { margin-bottom:20px; }
+    .form-group label { display:block; font-size:0.85rem; font-weight:600; color:var(--muted); margin-bottom:8px; text-transform:uppercase; letter-spacing:1px; }
+    .form-group input { width:100%; padding:14px 16px; background:var(--dark3); border:1px solid var(--border); border-radius:10px; color:var(--text); font-family:'Outfit',sans-serif; font-size:1rem; transition:border-color 0.2s; outline:none; }
+    .form-group input:focus { border-color:var(--orange); }
+    .btn-full { width:100%; padding:16px; font-size:1rem; border-radius:10px; justify-content:center; }
+    .modal-close { position:absolute; top:16px; right:20px; background:none; border:none; color:var(--muted); font-size:1.5rem; cursor:pointer; }
+    .modal-close:hover { color:var(--text); }
+    .modal-footer { text-align:center; margin-top:20px; color:var(--muted); font-size:0.9rem; }
+    .modal-footer a { color:var(--orange); cursor:pointer; }
+    .modal-footer a:hover { text-decoration:underline; }
+    .alert { padding:12px 16px; border-radius:10px; font-size:0.9rem; margin-bottom:16px; display:none; }
+    .alert.success { background:rgba(0,229,160,0.1); border:1px solid var(--green); color:var(--green); display:block; }
+    .alert.error   { background:rgba(255,69,96,0.1);  border:1px solid var(--red);  color:var(--red);  display:block; }
+    .alert.warning { background:rgba(255,184,0,0.1);  border:1px solid var(--yellow); color:var(--yellow); display:block; }
+    .hidden { display:none !important; }
+    .payment-info { background:var(--dark3); border:1px solid var(--border); border-radius:12px; padding:20px; margin-bottom:20px; }
+    .payment-info h4 { color:var(--orange); margin-bottom:12px; font-size:0.95rem; }
+    .payment-step { display:flex; align-items:flex-start; gap:12px; margin-bottom:10px; }
+    .step-num { width:24px; height:24px; border-radius:50%; background:var(--orange); color:#fff; display:flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:700; flex-shrink:0; }
+    .step-text { font-size:0.88rem; color:var(--muted); line-height:1.5; }
+    .step-text strong { color:var(--text); }
+    .phone-num { font-family:'Bebas Neue',sans-serif; font-size:1.6rem; letter-spacing:3px; color:var(--orange); background:rgba(255,107,0,0.1); border:1px dashed var(--orange); padding:10px 20px; border-radius:8px; display:inline-block; margin:8px 0; }
+    .spinner { width:20px; height:20px; border:2px solid rgba(255,255,255,0.3); border-top-color:#fff; border-radius:50%; animation:spin 0.8s linear infinite; display:inline-block; margin-right:8px; }
+    @keyframes spin { to{transform:rotate(360deg)} }
+  </style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="bg-glow"></div>
+
+<nav>
+  <div class="logo">BRE<span>ME</span></div>
+  <div class="nav-btns">
+    <button class="btn btn-ghost" onclick="openModal('login')">Connexion</button>
+    <button class="btn btn-primary" onclick="openModal('register')">Commencer →</button>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-badge">🚛 Logiciel de gestion de flotte N°1</div>
+  <h1>GÉREZ VOTRE<br/><span>FLOTTE</span><br/>INTELLIGEMMENT</h1>
+  <p>BREME centralise vos camions, chauffeurs et documents en un seul endroit sécurisé.</p>
+  <div class="hero-cta">
+    <button class="btn btn-primary" style="font-size:1.1rem;padding:16px 36px;" onclick="openModal('register')">🚀 Démarrer maintenant</button>
+    <button class="btn btn-ghost" style="font-size:1.1rem;padding:16px 36px;" onclick="openModal('login')">Se connecter</button>
+  </div>
+</section>
+
+<div class="stats">
+  <div class="stat-card"><div class="stat-num">500+</div><div class="stat-label">🚛 Camions gérés</div></div>
+  <div class="stat-card"><div class="stat-num">100%</div><div class="stat-label">🔐 Sécurisé</div></div>
+  <div class="stat-card"><div class="stat-num">24/7</div><div class="stat-label">⏰ Disponible</div></div>
+  <div class="stat-card"><div class="stat-num">10K</div><div class="stat-label">💰 FCFA / mois</div></div>
+</div>
+
+<section class="features">
+  <h2 class="section-title">TOUT CE DONT VOUS <span>AVEZ BESOIN</span></h2>
+  <div class="features-grid">
+    <div class="feature-card"><div class="feature-icon">🚛</div><h3>Gestion des Camions</h3><p>Ajoutez, modifiez et suivez tous vos véhicules. Assignez des chauffeurs et consultez l'historique.</p></div>
+    <div class="feature-card"><div class="feature-icon">👨‍✈️</div><h3>Gestion des Chauffeurs</h3><p>Gérez les profils, permis et contacts. Relation directe avec les camions assignés.</p></div>
+    <div class="feature-card"><div class="feature-icon">📄</div><h3>Documents & Alertes</h3><p>Suivez assurance, visite technique et carte grise. Alertes avant les expirations.</p></div>
+    <div class="feature-card"><div class="feature-icon">🔐</div><h3>Sécurité Maximale</h3><p>JWT + bcrypt, protection complète. Vos données sont entièrement protégées.</p></div>
+    <div class="feature-card"><div class="feature-icon">📊</div><h3>Dashboard Complet</h3><p>Vue d'ensemble en temps réel. Statistiques et alertes en un clic.</p></div>
+    <div class="feature-card"><div class="feature-icon">📱</div><h3>Paiement Orange Money</h3><p>Paiement simple et rapide. L'admin vérifie et active votre accès sous 24h.</p></div>
+  </div>
+</section>
+
+<section class="pricing">
+  <h2 class="section-title">ABONNEMENT <span>SIMPLE</span></h2>
+  <div class="price-card">
+    <div class="price-amount">10 000</div>
+    <div class="price-period">FCFA / mois — Tout inclus</div>
+    <div class="price-features">
+      <div class="price-feature"><span class="check">✓</span> Camions illimités</div>
+      <div class="price-feature"><span class="check">✓</span> Chauffeurs illimités</div>
+      <div class="price-feature"><span class="check">✓</span> Documents & alertes</div>
+      <div class="price-feature"><span class="check">✓</span> Dashboard complet</div>
+      <div class="price-feature"><span class="check">✓</span> Activation sous 24h après paiement</div>
+    </div>
+    <button class="btn btn-primary btn-full" onclick="openModal('register')">💳 S'abonner maintenant</button>
+  </div>
+</section>
+
+<footer>
+  <p>© 2025 <strong>BREME</strong> — Gestion de Flotte Professionnelle.</p>
+  <p style="margin-top:8px;">Conçu pour les transporteurs africains ❤️</p>
+</footer>
+
+<!-- ═══ MODAL LOGIN ═══ -->
+<div class="modal-overlay" id="modal-login">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('login')">×</button>
+    <div class="modal-title">CONNEXION</div>
+    <div class="modal-sub">Accédez à votre espace BREME</div>
+    <div id="login-alert"></div>
+    <div class="form-group"><label>Email</label><input type="email" id="login-email" placeholder="votre@email.com"/></div>
+    <div class="form-group"><label>Mot de passe</label><input type="password" id="login-password" placeholder="••••••••"/></div>
+    <button class="btn btn-primary btn-full" onclick="doLogin()">
+      <span id="login-spinner" class="spinner hidden"></span>Se connecter
+    </button>
+    <div class="modal-footer">Pas de compte ? <a onclick="switchModal('login','register')">S'inscrire</a></div>
+    <div class="modal-footer" style="margin-top:8px;"><a onclick="switchModal('login','forgot')">🔒 Mot de passe oublié ?</a></div>
+  </div>
+</div>
+
+<!-- ═══ MODAL REGISTER ═══ -->
+<div class="modal-overlay" id="modal-register">
+  <div class="modal" style="max-width:500px;">
+    <button class="modal-close" onclick="closeModal('register')">×</button>
+
+    <!-- ÉTAPE 1 : Infos -->
+    <div id="step-info">
+      <div class="modal-title">INSCRIPTION</div>
+      <div class="modal-sub">Créez votre compte BREME — 10 000 FCFA/mois</div>
+      <div id="register-alert"></div>
+      <div class="form-group"><label>Nom complet</label><input type="text" id="reg-name" placeholder="Votre nom"/></div>
+      <div class="form-group"><label>Email</label><input type="email" id="reg-email" placeholder="votre@email.com"/></div>
+      <div class="form-group"><label>Mot de passe</label><input type="password" id="reg-password" placeholder="Min. 8 caractères"/></div>
+      <button class="btn btn-primary btn-full" onclick="goToPayment()">Continuer vers le paiement →</button>
+      <div class="modal-footer">Déjà un compte ? <a onclick="switchModal('register','login')">Se connecter</a></div>
+    </div>
+
+    <!-- ÉTAPE 2 : Paiement -->
+    <div id="step-payment" class="hidden">
+      <div class="modal-title">PAIEMENT</div>
+      <div class="modal-sub">Abonnement mensuel BREME</div>
+      <div id="payment-alert"></div>
+      <div class="payment-info">
+        <h4>📱 Comment payer avec Orange Money :</h4>
+        <div class="payment-step"><div class="step-num">1</div><div class="step-text">Ouvrez Orange Money sur votre téléphone</div></div>
+        <div class="payment-step"><div class="step-num">2</div><div class="step-text">Transférez <strong>10 000 FCFA</strong> au numéro :</div></div>
+        <div style="text-align:center;margin:8px 0;">
+          <div class="phone-num">699 95 99 21</div>
+          <div style="font-size:0.8rem;color:var(--muted);margin-top:4px;">BRELE AHMAT BREME</div>
+        </div>
+        <div class="payment-step"><div class="step-num">3</div><div class="step-text">Notez le <strong>code de transaction</strong> reçu par SMS</div></div>
+        <div class="payment-step"><div class="step-num">4</div><div class="step-text">Entrez ce code ci-dessous et attendez la confirmation</div></div>
+      </div>
+      <div class="form-group">
+        <label>Code de transaction Orange Money</label>
+        <input type="text" id="transaction-code" placeholder="Ex: CM2024XXXXXXXXXX" style="text-transform:uppercase;letter-spacing:2px;"/>
+      </div>
+      <div class="form-group">
+        <label>Votre numéro Orange Money</label>
+        <input type="text" id="payer-phone" placeholder="Ex: 69X XXX XXX"/>
+      </div>
+      <button class="btn btn-primary btn-full" onclick="submitPayment()">
+        <span id="pay-spinner" class="spinner hidden"></span>
+        <span id="pay-text">✅ Envoyer ma demande</span>
+      </button>
+      <div style="margin-top:12px;">
+        <button class="btn btn-ghost btn-full" style="font-size:0.85rem;" onclick="goBack()">← Retour</button>
+      </div>
+    </div>
+
+    <!-- ÉTAPE 3 : En attente -->
+    <div id="step-success" class="hidden" style="text-align:center;padding:20px 0;">
+      <div style="font-size:4rem;margin-bottom:16px;">⏳</div>
+      <div class="modal-title" style="color:var(--yellow);">EN ATTENTE</div>
+      <div style="color:var(--muted);margin-bottom:16px;line-height:1.8;font-size:0.95rem;">
+        Votre demande est bien enregistrée !<br/>
+        <strong style="color:var(--text);">L'administrateur va vérifier votre paiement.</strong><br/>
+        Votre accès sera activé sous <strong style="color:var(--yellow);">24 heures maximum</strong>.
+      </div>
+      <div style="background:rgba(255,184,0,0.08);border:1px solid rgba(255,184,0,0.3);border-radius:12px;padding:16px;margin-bottom:24px;font-size:0.88rem;color:var(--muted);">
+        💡 Une fois confirmé, connectez-vous avec votre email et mot de passe pour accéder à votre dashboard.
+      </div>
+      <button class="btn btn-ghost btn-full" onclick="closeModal('register')">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = window.location.hostname==='localhost'||window.location.hostname==='127.0.0.1' ? 'http://localhost:3000/api' : '/api';
+
+function openModal(name)  { document.getElementById('modal-'+name).classList.add('active'); }
+function closeModal(name) { document.getElementById('modal-'+name).classList.remove('active'); }
+function switchModal(from,to) { closeModal(from); openModal(to); }
+
+function showAlert(id, msg, type) {
+  const el = document.getElementById(id);
+  el.className = 'alert ' + type;
+  el.textContent = msg;
+}
+
+// LOGIN
+async function doLogin() {
+  const email    = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  if (!email || !password) return showAlert('login-alert','Remplissez tous les champs.','error');
+  document.getElementById('login-spinner').classList.remove('hidden');
+  try {
+    const res  = await fetch(API+'/auth/login', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({email, password})
+    });
+    const data = await res.json();
+    if (res.ok) {
+      localStorage.setItem('breme_token', data.token);
+      localStorage.setItem('breme_role',  data.role);
+      window.location.href = data.role === 'admin' ? 'admin.html' : 'dashboard.html';
+    } else {
+      showAlert('login-alert', data.message || 'Erreur de connexion.', 'error');
+    }
+  } catch(e) {
+    showAlert('login-alert','Serveur non disponible.','error');
+  }
+  document.getElementById('login-spinner').classList.add('hidden');
+}
+
+// INSCRIPTION étape 1
+function goToPayment() {
+  const name     = document.getElementById('reg-name').value.trim();
+  const email    = document.getElementById('reg-email').value.trim();
+  const password = document.getElementById('reg-password').value;
+  if (!name || !email || !password) return showAlert('register-alert','Remplissez tous les champs.','error');
+  if (password.length < 8) return showAlert('register-alert','Mot de passe min. 8 caractères.','error');
+  document.getElementById('step-info').classList.add('hidden');
+  document.getElementById('step-payment').classList.remove('hidden');
+}
+function goBack() {
+  document.getElementById('step-payment').classList.add('hidden');
+  document.getElementById('step-info').classList.remove('hidden');
+}
+
+// INSCRIPTION étape 2 — toujours en attente
+async function submitPayment() {
+  const txCode = document.getElementById('transaction-code').value.trim().toUpperCase();
+  const phone  = document.getElementById('payer-phone').value.trim();
+  if (!txCode || !phone) return showAlert('payment-alert','Entrez le code de transaction et votre numéro.','error');
+  if (txCode.length < 6) return showAlert('payment-alert','Code de transaction trop court.','error');
+
+  document.getElementById('pay-spinner').classList.remove('hidden');
+  document.getElementById('pay-text').textContent = 'Envoi en cours...';
+
+  const name     = document.getElementById('reg-name').value.trim();
+  const email    = document.getElementById('reg-email').value.trim();
+  const password = document.getElementById('reg-password').value;
+
+  try {
+    const res  = await fetch(API+'/auth/register', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ name, email, password, transactionCode: txCode, payerPhone: phone })
+    });
+    const data = await res.json();
+
+    if (res.status === 202) {
+      // ✅ Succès — en attente de confirmation admin
+      localStorage.setItem('breme_token', data.token);
+      localStorage.setItem('breme_role',  'user');
+      document.getElementById('step-payment').classList.add('hidden');
+      document.getElementById('step-success').classList.remove('hidden');
+    } else if (res.status === 409) {
+      showAlert('payment-alert', data.message, 'error');
+    } else {
+      showAlert('payment-alert', data.message || 'Erreur. Réessayez.', 'error');
+    }
+  } catch(e) {
+    showAlert('payment-alert','Serveur non disponible. Vérifiez que le backend est lancé.','error');
+  }
+  document.getElementById('pay-spinner').classList.add('hidden');
+  document.getElementById('pay-text').textContent = '✅ Envoyer ma demande';
+}
+
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if(e.target===o) o.classList.remove('active'); });
+});
+
+// Si déjà connecté
+window.addEventListener('DOMContentLoaded', () => {
+  const token = localStorage.getItem('breme_token');
+  if (token) {
+    const role = localStorage.getItem('breme_role');
+    window.location.href = role === 'admin' ? 'admin.html' : 'dashboard.html';
+  }
+});
+
+// ── MOT DE PASSE OUBLIÉ ───────────────────────────────────────
+let forgotIdentifier = '';
+let forgotCode = '';
+
+function showForgotStep(step) {
+  [1,2,3].forEach(s => {
+    const el = document.getElementById('forgot-step'+s);
+    if (el) el.classList.toggle('hidden', s!==step);
+  });
+}
+
+async function requestResetCode() {
+  const identifier = document.getElementById('forgot-identifier').value.trim();
+  if (!identifier) return showForgotAlert('forgot-alert', 'Entrez votre email ou téléphone.', 'error');
+  forgotIdentifier = identifier;
+  const spinner = document.getElementById('forgot-spinner');
+  if (spinner) spinner.classList.remove('hidden');
+  try {
+    const res = await fetch(API+'/auth/forgot-password', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ identifier })
+    });
+    const d = await res.json();
+    if (spinner) spinner.classList.add('hidden');
+    showForgotAlert('forgot-alert', d.message || 'Code envoyé !', 'success');
+    setTimeout(() => showForgotStep(2), 1500);
+  } catch(e) {
+    if (spinner) spinner.classList.add('hidden');
+    showForgotAlert('forgot-alert', 'Erreur serveur.', 'error');
+  }
+}
+
+async function verifyResetCode() {
+  const code = document.getElementById('forgot-code').value.trim();
+  if (!code || code.length < 6) return showForgotAlert('forgot-code-alert', 'Entrez le code à 6 chiffres.', 'error');
+  forgotCode = code;
+  try {
+    const res = await fetch(API+'/auth/verify-reset-code', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ identifier: forgotIdentifier, code })
+    });
+    const d = await res.json();
+    if (res.ok) {
+      showForgotStep(3);
+    } else {
+      showForgotAlert('forgot-code-alert', d.message || 'Code invalide.', 'error');
+    }
+  } catch(e) {
+    showForgotAlert('forgot-code-alert', 'Erreur serveur.', 'error');
+  }
+}
+
+async function resetPassword() {
+  const newPassword = document.getElementById('forgot-newpwd').value;
+  const confirmPwd  = document.getElementById('forgot-confirmpwd').value;
+  if (!newPassword) return showForgotAlert('forgot-pwd-alert', 'Entrez un mot de passe.', 'error');
+  if (newPassword !== confirmPwd) return showForgotAlert('forgot-pwd-alert', 'Les mots de passe ne correspondent pas.', 'error');
+  if (newPassword.length < 6) return showForgotAlert('forgot-pwd-alert', 'Minimum 6 caractères.', 'error');
+  try {
+    const res = await fetch(API+'/auth/reset-password', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ identifier: forgotIdentifier, code: forgotCode, newPassword })
+    });
+    const d = await res.json();
+    if (res.ok) {
+      showForgotAlert('forgot-pwd-alert', '✅ ' + d.message, 'success');
+      setTimeout(() => { closeModal('forgot'); openModal('login'); showForgotStep(1); }, 2500);
+    } else {
+      showForgotAlert('forgot-pwd-alert', d.message || 'Erreur.', 'error');
+    }
+  } catch(e) {
+    showForgotAlert('forgot-pwd-alert', 'Erreur serveur.', 'error');
+  }
+}
+
+function showForgotAlert(id, msg, type) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.className = 'alert ' + (type==='success'?'success':type==='error'?'error':'warning');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+</script>
+
+<!-- Modal Mot de Passe Oublié -->
+<div class="modal-overlay" id="modal-forgot">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('forgot')">×</button>
+    
+    <!-- Étape 1: Saisie email/téléphone -->
+    <div id="forgot-step1">
+      <div class="modal-title">MOT DE PASSE OUBLIÉ</div>
+      <div class="modal-sub">Entrez votre email ou numéro de téléphone. Nous vous enverrons un code de vérification.</div>
+      <div id="forgot-alert"></div>
+      <div class="form-group"><label>Email ou Téléphone</label><input type="text" id="forgot-identifier" placeholder="votre@email.com ou 07XXXXXXXX"/></div>
+      <button class="btn btn-primary btn-full" onclick="requestResetCode()">
+        <span id="forgot-spinner" class="spinner hidden"></span>Envoyer le code
+      </button>
+      <div class="modal-footer"><a onclick="switchModal('forgot','login')">← Retour à la connexion</a></div>
+    </div>
+
+    <!-- Étape 2: Saisie du code -->
+    <div id="forgot-step2" class="hidden">
+      <div class="modal-title">CODE DE VÉRIFICATION</div>
+      <div class="modal-sub">Entrez le code à 6 chiffres reçu par SMS ou email.</div>
+      <div id="forgot-code-alert"></div>
+      <div class="form-group"><label>Code de vérification</label><input type="text" id="forgot-code" placeholder="123456" maxlength="6" style="text-align:center;font-size:1.5rem;letter-spacing:6px;"/></div>
+      <button class="btn btn-primary btn-full" onclick="verifyResetCode()">Vérifier le code</button>
+      <div class="modal-footer"><a onclick="showForgotStep(1)">← Renvoyer un code</a></div>
+    </div>
+
+    <!-- Étape 3: Nouveau mot de passe -->
+    <div id="forgot-step3" class="hidden">
+      <div class="modal-title">NOUVEAU MOT DE PASSE</div>
+      <div class="modal-sub">Choisissez un nouveau mot de passe sécurisé.</div>
+      <div id="forgot-pwd-alert"></div>
+      <div class="form-group"><label>Nouveau mot de passe</label><input type="password" id="forgot-newpwd" placeholder="••••••••"/></div>
+      <div class="form-group"><label>Confirmer le mot de passe</label><input type="password" id="forgot-confirmpwd" placeholder="••••••••"/></div>
+      <button class="btn btn-primary btn-full" onclick="resetPassword()">✅ Réinitialiser le mot de passe</button>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
