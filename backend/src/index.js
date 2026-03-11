@@ -15,11 +15,13 @@ const app = express();
 // Helmet : protège les headers HTTP
 app.use(helmet());
 
-// CORS : autoriser le frontend
+// CORS : autoriser tous les origins
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-  credentials: true
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
+app.options('*', cors());
 
 // Rate limiting : max 100 requêtes / 15 min par IP
 const limiter = rateLimit({
