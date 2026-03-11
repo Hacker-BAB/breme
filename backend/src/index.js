@@ -1,7 +1,6 @@
 // src/index.js — Serveur principal BREME
 require('dotenv').config();
 const express = require('express');
-const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
@@ -9,19 +8,24 @@ const path = require('path');
 const app = express();
 
 // ============================================
-// 🔐 SÉCURITÉ
+// 🔐 CORS — EN TOUT PREMIER (avant helmet)
 // ============================================
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS,PATCH');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+  next();
+});
 
-// Helmet : protège les headers HTTP
-app.use(helmet());
-
-// CORS : autoriser tous les origins
-app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+// Helmet : protège les headers HTTP (CORS désactivé dans helmet)
+app.use(helmet({
+  crossOriginResourcePolicy: false,
+  crossOriginOpenerPolicy: false,
+  crossOriginEmbedderPolicy: false
 }));
-app.options('*', cors());
 
 // Rate limiting : max 100 requêtes / 15 min par IP
 const limiter = rateLimit({
